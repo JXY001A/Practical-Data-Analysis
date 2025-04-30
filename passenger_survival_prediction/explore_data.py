@@ -98,5 +98,12 @@ test_features=dvec.transform(test_features.to_dict(orient='records'))
 pred_labels = clf.predict(test_features)
 
 
+# rounds(x,6) ： 并将 x 四舍五入保留6位小数
+# .score() 方法，计算模型在训练数据上的 预测准确率。
+
+# 输入： train_features: 训练数据的特征矩阵（如 X_train）。train_labels: 训练数据的真实标签（如 y_train）。
+
+# 输出：返回一个浮点数（如 0.956789），表示模型在训练集上的 正确预测比例（准确率）。
+
 acc_decision_tree = round(clf.score(train_features, train_labels), 6)
 print(u'score准确率为 %.4lf' % acc_decision_tree)
