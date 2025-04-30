@@ -1,5 +1,6 @@
 import pandas as pd
 from sklearn.feature_extraction import DictVectorizer
+from sklearn.tree import DecisionTreeClassifier
 
 
 train_data = pd.read_csv('/Users/eleme/interview/Practical-Data-Analysis/decision_tree/passenger_survival_prediction/titanic_data/train.csv')
@@ -44,8 +45,8 @@ print('Age mean',train_data['Age'].mean())
 # inplace=False（默认）：返回填充后的新对象，原对象不变。
 # train_data['Age'].fillna(train_data['Age'].mean(), inplace=True)
 
-# train_data['Fare'].fillna(train_data['Fare'].mean(), inplace=True)
-# test_data['Fare'].fillna(test_data['Fare'].mean(),inplace=True)
+train_data['Fare'].fillna(train_data['Fare'].mean(), inplace=True)
+test_data['Fare'].fillna(test_data['Fare'].mean(),inplace=True)
 
 
 #各个港口的统计数量
@@ -55,7 +56,7 @@ print('港口聚合总数',train_data['Embarked'].value_counts())
 # Q     77
 
 #使用最多的港口 'S' 来填充缺省值
-test_data['Embarked'].fillna('S')
+test_data['Embarked'].fillna('S',inplace=True)
 test_data['Embarked'].fillna('S',inplace=True)
 
 # TODO: 特征选择
@@ -76,9 +77,26 @@ train_labels = train_data['Survived']
 # 测试特征提取
 test_features = test_data[features]
 
-# 
+# 同理Embarked有S、C、Q三种可能，我们也可以改成Embarked=S、Embarked=C和Embarked=Q三个字段，数值用0或1来表示。
+# 那该如何操作呢，我们可以使用sklearn特征选择中的DictVectorizer类，用它将可以处理符号化的对象，将符号转成数字0/1进行表示
 dvec=DictVectorizer(sparse=False)
-
-train_features=dvec.fit_transform(train_features.to_dict(orient='record'))
+train_features= dvec.fit_transform(train_features.to_dict(orient='records'))
 # print(dvec.feature_names_)
-# print(dvec.get_feature_names_out())
+print(dvec.get_feature_names_out())
+
+# print(train_features[0])
+
+
+# TODO: 初始化决策树模型
+# 信息熵算法：ID3
+clf = DecisionTreeClassifier(criterion='entropy')
+clf.fit(train_features, train_labels)
+
+
+test_features=dvec.transform(test_features.to_dict(orient='records'))
+# 决策树预测
+pred_labels = clf.predict(test_features)
+
+
+acc_decision_tree = round(clf.score(train_features, train_labels), 6)
+print(u'score准确率为 %.4lf' % acc_decision_tree)
